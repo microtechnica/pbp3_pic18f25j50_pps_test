@@ -1,0 +1,87 @@
+'PIC18F25J50 PPS TEST
+
+#CONFIG
+    CONFIG  WDTEN = OFF           ; Disabled
+    CONFIG  PLLDIV = 5            ; Divide by 5 (20 MHz oscillator input)
+    CONFIG  STVREN = ON           ; Enabled
+    CONFIG  XINST = OFF           ; Disabled
+    CONFIG  DEBUG = OFF           ; Disabled
+    CONFIG  CPUDIV = OSC1         ; No CPU system clock divide
+    CONFIG  CP0 = OFF             ; Program memory is not code-protected
+    CONFIG  OSC = INTOSC          ; INTOSC
+    CONFIG  T1DIG = ON            ; Secondary Oscillator clock source may be selected
+    CONFIG  LPT1OSC = OFF         ; High-power operation
+    CONFIG  FCMEN = OFF           ; Disabled
+    CONFIG  IESO = OFF            ; Disabled
+    CONFIG  WDTPS = 512           ; 1:512
+    CONFIG  DSWDTOSC = INTOSCREF  ; DSWDT uses INTRC
+    CONFIG  RTCOSC = T1OSCREF     ; RTCC uses T1OSC/T1CKI
+    CONFIG  DSBOREN = OFF         ; Disabled
+    CONFIG  DSWDTEN = OFF         ; Disabled
+    CONFIG  DSWDTPS = G2          ; 1:2,147,483,648 (25.7 days)
+    CONFIG  IOL1WAY = OFF         ; The IOLOCK bit (PPSCON<0>) can be set once
+    CONFIG  MSSP7B_EN = MSK7      ; 7 Bit address masking mode
+    CONFIG  WPFP = PAGE_0         ; Write Protect Program Flash Page 0
+    CONFIG  WPEND = PAGE_WPFP     ; Page WPFP<5:0> through Configuration Words erase/write protected
+    CONFIG  WPCFG = OFF           ; Configuration Words page not erase/write-protected
+    CONFIG  WPDIS = OFF           ; WPFP<5:0>/WPEND region ignored
+#ENDCONFIG
+
+DEFINE OSC 8
+
+DEFINE HSER_RCSTA 90h 
+DEFINE HSER_TXSTA 24h
+DEFINE HSER_BAUD 9600 
+ 
+DEFINE HSER2_RCSTA 90h 
+DEFINE HSER2_TXSTA 24h
+DEFINE HSER2_BAUD 9600 
+
+Ud var byte
+                                                                     
+init:
+    OSCCON = %01110011
+
+    ADCON0 = 0
+    ANCON0 = $FF
+    ANCON1 = $FF
+    
+    
+'UART_default = TX:RC6 RX:RC7       
+'UART_PPS = TX:RA1(RP1) RX:RA0(RP0)
+    goto uart_pps
+
+uart_default:
+
+    TRISA = 0
+    TRISB = 0
+    TRISC = %10000000
+    
+    hserin [ud]
+    hserout [ud]
+    
+    goto uart_default
+    
+    
+uart_pps:
+
+    TRISA = %00000001
+    TRISB = 0
+    TRISC = 0
+    RCSTA2.7 = 1
+    
+    
+    RPINR16 = 0     'RX2 is PR0(RA0)
+    RPOR1 = 5       'TX2 is RP1(RA1) (see datasheet table10-14 p.152)
+    
+       
+    hserin2 [ud]  
+    hserout2 [ud] 
+    
+    goto uart_pps
+    
+    
+    
+    
+
+    

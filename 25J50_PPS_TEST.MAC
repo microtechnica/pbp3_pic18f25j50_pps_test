@@ -1,0 +1,45 @@
+
+	NOLIST
+; PICBASIC PRO(TM) Compiler 3.1.1.4, (c) 1997, 2018 ME Labs, Inc. All Rights Reserved. 
+
+LABEL?L macro Label
+        RST?RP
+    ifdef PM_USED
+        LALL
+Label
+        XALL
+    else
+Label
+    endif
+    endm
+
+GOTO?L macro Label
+        L?GOTO  Label
+    endm
+
+HSERIN?B macro Bout
+        L?CALL  HSERIN
+        MOVE?AB Bout
+    endm
+HSERIN_USED = 1
+
+HSEROUT?B macro Bin
+        MOVE?BA Bin
+        L?CALL  HSEROUT
+    endm
+HSEROUT_USED = 1
+
+HSERIN2?B macro Bout
+        L?CALL  HSERIN2
+        MOVE?AB Bout
+    endm
+HSERIN2_USED = 1
+
+HSEROUT2?B macro Bin
+        MOVE?BA Bin
+        L?CALL  HSEROUT2
+    endm
+HSEROUT2_USED = 1
+
+
+	LIST
